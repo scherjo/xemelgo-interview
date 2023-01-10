@@ -126,7 +126,7 @@ function WorkLogSearch(): JSX.Element {
         submittedID === "" ? null :
         <View>
           <Heading level={4} margin="1rem 0">
-            Displaying results for {submittedUsername} on {workDate}
+            Displaying results for {submittedUsername} on {submittedWorkDate}
           </Heading>
           <WorkLogReport
             employeeID={submittedID}

@@ -24,7 +24,7 @@ function WorkLogReport(props: WorkLogReportProps): JSX.Element {
       calculateTotalSecondsClockedIn(result);
       calculateTotalSecondsWorkOrder(result);
     });
-  }, []);
+  }, [props]);
 
   function calculateTotalSecondsClockedIn(workLogs: WorkLog[]): void {
     let total: number = 0;
@@ -63,7 +63,7 @@ function WorkLogReport(props: WorkLogReportProps): JSX.Element {
         </Heading>
         <Heading level={5}>
           Total Efficiency: {totalSecondsClockedIn === 0 ? "N/A" :
-                               `${(totalSecondsWorkOrder / totalSecondsClockedIn).toFixed(1)}%`}
+                               `${(totalSecondsWorkOrder / totalSecondsClockedIn * 100).toFixed(1)}%`}
         </Heading>
       </Flex>
       {

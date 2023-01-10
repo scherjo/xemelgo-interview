@@ -5,6 +5,12 @@ import { AmplifyUser } from "@aws-amplify/ui";
 import WorkTimeLogger from "./WorkTimeLogger";
 import WorkLogSearch from "./WorkLogSearch";
 
+/**
+ * Returns true if the given user is a manager, otherwise returns false.
+ * 
+ * @param user the user
+ * @returns true if the user belongs to the 'managers' Cognito group, else false
+ */
 function isManager(user: AmplifyUser | undefined): boolean {
   const groups = user?.getSignInUserSession()?.getAccessToken().payload["cognito:groups"];
   return Boolean(groups?.includes("managers"));

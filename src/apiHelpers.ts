@@ -1,15 +1,15 @@
 import { GraphQLResult } from "@aws-amplify/api-graphql";
 import { API } from "aws-amplify";
 import { createWorkLog, updateWorkLog } from "./graphql/mutations";
-import { employeesByEmployeeUsername, getWorkLog, listWorkLogs } from "./graphql/queries";
+import { employeesByEmployeeUsername, getEmployee, getWorkLog, listWorkLogs } from "./graphql/queries";
 
-interface WorkOrder {
+export interface WorkOrder {
   orderNum: string,
   startTime: string,
   endTime: string
 }
 
-interface WorkLog {
+export interface WorkLog {
   employeeID: string,
   clockInTime: string,
   clockOutTime: string | null,
@@ -21,17 +21,42 @@ interface Employee {
   employeeUsername: string
 }
 
-export async function getEmployeeID(username: string): Promise<string> {
-  const apiData: GraphQLResult<any> = await API.graphql({
-    query: employeesByEmployeeUsername,
-    variables: {
-      employeeUsername: username
-    }
-  });
+export async function getEmployeeUsername(id: string): Promise<string> {
+  let apiData: GraphQLResult<any>;
+  try {
+    apiData = await API.graphql({
+      query: getEmployee,
+      variables: {
+        employeeID: id
+      }
+    });
+  } catch (e) {
+    return "";
+  }
 
   if (apiData.errors) {
     return "";
   }
+  return apiData.data.getEmployee.employeeID;
+}
+
+export async function getEmployeeID(username: string): Promise<string> {
+  let apiData: GraphQLResult<any>;
+  try {
+    apiData = await API.graphql({
+      query: employeesByEmployeeUsername,
+      variables: {
+        employeeUsername: username
+      }
+    });
+  } catch (e) {
+    return "";
+  }
+
+  if (apiData.errors) {
+    return "";
+  }
+
   const employees: Employee[] = apiData.data.employeesByEmployeeUsername.items;
 
   if (employees.length > 0) {
@@ -41,18 +66,23 @@ export async function getEmployeeID(username: string): Promise<string> {
 }
 
 export async function getClockInTime(employeeID: string): Promise<string> {
-  const apiData: GraphQLResult<any> = await API.graphql({
-    query: listWorkLogs,
-    variables: {
-      employeeID: employeeID,
-      sortDirection: "DESC",
-      filter: {
-        clockOutTime: {
-          attributeExists: false
+  let apiData: GraphQLResult<any>;
+  try {
+    apiData = await API.graphql({
+      query: listWorkLogs,
+      variables: {
+        employeeID: employeeID,
+        sortDirection: "DESC",
+        filter: {
+          clockOutTime: {
+            attributeExists: false
+          }
         }
       }
-    }
-  });
+    });
+  } catch (e) {
+    return "";
+  }
 
   if (apiData.errors) {
     return "";
@@ -71,12 +101,18 @@ export async function clockIn(employeeID: string, clockInTime: string): Promise<
     employeeID: employeeID,
     clockInTime: clockInTime
   };
-  const apiData: GraphQLResult<any> = await API.graphql({
-    query: createWorkLog,
-    variables: {
-      input: workLogData
-    }
-  });
+
+  let apiData: GraphQLResult<any>
+  try {
+    apiData = await API.graphql({
+      query: createWorkLog,
+      variables: {
+        input: workLogData
+      }
+    });
+  } catch (e) {
+    return "Error initializing new work log";
+  }
 
   if (apiData.errors) {
     return "Error initializing new work log";
@@ -90,12 +126,17 @@ export async function clockOut(employeeID: string, clockInTime: string, clockOut
     clockInTime: clockInTime,
     clockOutTime: clockOutTime
   };
-  const apiData: GraphQLResult<any> = await API.graphql({
-    query: updateWorkLog,
-    variables: {
-      input: workLogData
-    }
-  });
+  let apiData: GraphQLResult<any>; 
+  try {
+    apiData = await API.graphql({
+      query: updateWorkLog,
+      variables: {
+        input: workLogData
+      }
+    });
+  } catch (e) {
+    return "Error clocking out";
+  }
 
   if (apiData.errors) {
     return "Error clocking out";
@@ -104,13 +145,18 @@ export async function clockOut(employeeID: string, clockInTime: string, clockOut
 }
 
 async function getWorkLogInfo(employeeID: string, clockInTime: string): Promise<WorkLog | null> {
-  const apiData: GraphQLResult<any> = await API.graphql({
-    query: getWorkLog,
-    variables: {
-      employeeID: employeeID,
-      clockInTime: clockInTime
-    }
-  });
+  let apiData: GraphQLResult<any>;
+  try {
+    apiData = await API.graphql({
+      query: getWorkLog,
+      variables: {
+        employeeID: employeeID,
+        clockInTime: clockInTime
+      }
+    });
+  } catch (e) {
+    return null;
+  }
 
   if (apiData.errors) {
     return null;
@@ -118,26 +164,54 @@ async function getWorkLogInfo(employeeID: string, clockInTime: string): Promise<
   return apiData.data.getWorkLog;
 }
 
-async function getClockInPeriod(employeeID: string, startTime: string): Promise<string> {
-  const apiData: GraphQLResult<any> = await API.graphql({
-    query: listWorkLogs,
-    variables: {
-      employeeID: employeeID,
-      clockInTime: {
-        le: startTime
-      },
-      sortDirection: "DESC"
-    }
-  });
+export async function getWorkLogsFromDate(employeeID: string, date: string): Promise<WorkLog[]> {
+  const nextDay: string = `${date.substring(0, date.length - 1)}${Number(date.charAt(date.length - 1)) + 1}`;
+  let apiData: GraphQLResult<any>;
+  try {
+    apiData = await API.graphql({
+      query: listWorkLogs,
+      variables: {
+        employeeID: employeeID,
+        clockInTime: {
+          between: [date, nextDay]
+        }
+      }
+    });
+  } catch (e) {
+    return [];
+  }
 
+  if (apiData.errors) {
+    return [];
+  }
+  return apiData.data.listWorkLogs.items;
+}
+
+async function getClockInPeriod(employeeID: string, startTime: string): Promise<string> {
+  let apiData: GraphQLResult<any>;
+  try {
+    apiData = await API.graphql({
+      query: listWorkLogs,
+      variables: {
+        employeeID: employeeID,
+        clockInTime: {
+          le: startTime
+        },
+        sortDirection: "DESC"
+      }
+    });
+  } catch (e) {
+    return "";
+  }
+  
   if (apiData.errors) {
     return "";
   }
 
-  const workLogsInfo: WorkLog[] = apiData.data.listWorkLogs.items;
+  const workLogs: WorkLog[] = apiData.data.listWorkLogs.items;
 
-  if (workLogsInfo.length > 0) {
-    return workLogsInfo[0].clockInTime;
+  if (workLogs.length > 0) {
+    return workLogs[0].clockInTime;
   }
   return "";
 }
@@ -165,12 +239,17 @@ export async function addWorkOrder(employeeID: string, orderNum: string, startTi
     workOrders: workOrders
   };
 
-  const apiData: GraphQLResult<any> = await API.graphql({
-    query: updateWorkLog,
-    variables: {
-      input: workLogData
-    }
-  });
+  let apiData: GraphQLResult<any>;
+  try {
+    apiData = await API.graphql({
+      query: updateWorkLog,
+      variables: {
+        input: workLogData
+      }
+    });
+  } catch (e) {
+    return "Error submitting work order";
+  }
 
   if (apiData.errors) {
     return "Error submitting work order";

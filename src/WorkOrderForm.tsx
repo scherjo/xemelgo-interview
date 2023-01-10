@@ -1,18 +1,17 @@
-import { View, Flex, Text, TextField, Button } from "@aws-amplify/ui-react";
-import moment from "moment";
+import { View, Flex, Text, TextField, Button, Heading } from "@aws-amplify/ui-react";
 import { FormEvent, SetStateAction, useState } from "react";
 import { addWorkOrder } from "./apiHelpers";
+import {
+  DATETIME_FORMAT_STR,
+  dateTimeIsValid,
+  dateTimeToDate,
+  getFormEntryString,
+  matchesDateTimeFormat,
+  matchesOrderNumberFormat
+} from "./utilities";
 
 interface WorkOrderFormProps {
   employeeID: string
-}
-
-function matchesDateTimeFormat(dateTime: string): boolean {
-  return /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(dateTime);
-}
-
-function getFormEntryString(form: FormData, name: string): string {
-  return form.get(name) === null ? "" : form.get(name) as string;
 }
 
 function WorkOrderForm(props: WorkOrderFormProps): JSX.Element {
@@ -20,14 +19,13 @@ function WorkOrderForm(props: WorkOrderFormProps): JSX.Element {
   const [startTimeErrorMessage, setStartTimeErrorMessage] = useState("");
   const [endTimeErrorMessage, setEndTimeErrorMessage] = useState("");
   const [submitErrorMessage, setSubmitErrorMessage] = useState("");
-  
-  const dateTimeFormat: string = "YYYY-MM-DD HH:mm:ss";
 
   function handleFormReset(event: FormEvent): void {
     (event.target as HTMLFormElement).reset();
     setOrderNumErrorMessage("");
     setStartTimeErrorMessage("");
     setEndTimeErrorMessage("");
+    setSubmitErrorMessage("");
   }
 
   async function submitWorkOrderInfo(event: FormEvent): Promise<void> {
@@ -58,7 +56,7 @@ function WorkOrderForm(props: WorkOrderFormProps): JSX.Element {
       return false;
     }
 
-    if (moment(startTime, dateTimeFormat).toDate() > moment(endTime, dateTimeFormat).toDate()) {
+    if (dateTimeToDate(startTime, DATETIME_FORMAT_STR) > dateTimeToDate(endTime, DATETIME_FORMAT_STR)) {
       setEndTimeErrorMessage("End time must be on or after start time");
       return false;
     }
@@ -71,7 +69,7 @@ function WorkOrderForm(props: WorkOrderFormProps): JSX.Element {
       setOrderNumErrorMessage("Order number cannot be empty");
       return false;
     }
-    if (!/^[a-zA-Z0-9]+$/.test(orderNum)) {
+    if (!matchesOrderNumberFormat(orderNum)) {
       setOrderNumErrorMessage("Order number must consist only of alphanumeric characters");
       return false;
     }
@@ -96,10 +94,10 @@ function WorkOrderForm(props: WorkOrderFormProps): JSX.Element {
       return false;
     }
     if (!matchesDateTimeFormat(time)) {
-      setErrorMessage(`${name} must be of the form ${dateTimeFormat}`);
+      setErrorMessage(`${name} must be of the form ${DATETIME_FORMAT_STR}`);
       return false;
     }
-    if (!moment(time, dateTimeFormat).isValid()) {
+    if (!dateTimeIsValid(time, DATETIME_FORMAT_STR)) {
       setErrorMessage(`${name} must be a valid time`);
       return false;
     }
@@ -108,13 +106,13 @@ function WorkOrderForm(props: WorkOrderFormProps): JSX.Element {
   }
 
   return (
-    <View>
-      <Text></Text>
-      <View as="form" margin="3rem" onSubmit={submitWorkOrderInfo} onReset={handleFormReset}>
+    <View margin="1rem">
+      <Heading level={5}>Log Work Order</Heading>
+      <View as="form" margin="1rem 2rem" onSubmit={submitWorkOrderInfo} onReset={handleFormReset}>
         <Flex direction="column" justifyContent="center">
           <TextField
             name="orderNum"
-            placeholder="123456789"
+            placeholder="0123456789"
             label="Order Number"
             variation="quiet"
             hasError={orderNumErrorMessage !== ""}
@@ -143,6 +141,12 @@ function WorkOrderForm(props: WorkOrderFormProps): JSX.Element {
             <Button type="reset" variation="primary">Reset</Button>
             <Button type="submit" variation="primary">Submit</Button>
           </Flex>
+          <Text
+            opacity={submitErrorMessage === "" ? 0 : 1}
+            variation="error"
+          >
+            {submitErrorMessage}
+          </Text>
         </Flex>
       </View>
     </View>

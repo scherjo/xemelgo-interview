@@ -1,16 +1,11 @@
-import { View, Button } from "@aws-amplify/ui-react";
-import dateFormat from "dateformat";
+import { View, Button, Flex, Text } from "@aws-amplify/ui-react";
 import { useEffect, useState } from "react";
 import { getEmployeeID, getClockInTime, clockIn, clockOut } from "./apiHelpers";
+import { getCurrentTimeString } from "./utilities";
 import WorkOrderForm from "./WorkOrderForm";
 
 interface WorkTimeLoggerProps {
   username: string
-}
-
-function getCurrentTimeString(): string {
-  const now: Date = new Date();
-  return dateFormat(now, "yyyy-mm-dd HH:MM:ss");
 }
 
 function WorkTimeLogger(props: WorkTimeLoggerProps): JSX.Element {
@@ -45,13 +40,16 @@ function WorkTimeLogger(props: WorkTimeLoggerProps): JSX.Element {
   }
 
   return (
-    <View>
-      <Button
-        onClick={clockInTime === "" ? handleClockIn : handleClockOut}
-        disabled={!hasCheckedClockInTime} variation="primary"
-      >
-        {clockInTime === "" ? "Clock In" : "Clock Out"}
-      </Button>
+    <View margin="1rem">
+      <Flex direction="row" alignItems="center">
+        <Button
+          onClick={clockInTime === "" ? handleClockIn : handleClockOut}
+          disabled={!hasCheckedClockInTime} variation="primary"
+        >
+          {clockInTime === "" ? "Clock In" : "Clock Out"}
+        </Button>
+        <Text opacity={clockInTime === "" ? 0 : 1}>Clocked in since {clockInTime}</Text>
+      </Flex>
       <WorkOrderForm employeeID={employeeID}></WorkOrderForm>
     </View>
   );

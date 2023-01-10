@@ -1,6 +1,6 @@
 import "./App.css";
 import "@aws-amplify/ui-react/styles.css";
-import { Authenticator, Button, Flex, TabItem, Tabs, View, Text, Heading } from "@aws-amplify/ui-react";
+import { Authenticator, Button, Flex, TabItem, Tabs, View, Heading } from "@aws-amplify/ui-react";
 import { AmplifyUser } from "@aws-amplify/ui";
 import WorkTimeLogger from "./WorkTimeLogger";
 import WorkLogSearch from "./WorkLogSearch";
@@ -26,7 +26,7 @@ function App(): JSX.Element {
             <TabItem title={user!.username}>
               <WorkTimeLogger username={user!.username!}></WorkTimeLogger>
             </TabItem>
-            <TabItem title="Manager" isDisabled={false}>
+            <TabItem title="Reports" isDisabled={!isManager(user)}>
               <WorkLogSearch></WorkLogSearch>
             </TabItem>
           </Tabs>

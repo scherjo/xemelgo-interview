@@ -34,10 +34,10 @@ export async function getEmployeeUsername(id: string): Promise<string> {
     return "";
   }
 
-  if (apiData.errors) {
+  if (apiData.errors || !apiData.data.getEmployee) {
     return "";
   }
-  return apiData.data.getEmployee.employeeID;
+  return apiData.data.getEmployee.employeeUsername;
 }
 
 export async function getEmployeeID(username: string): Promise<string> {
@@ -84,7 +84,7 @@ export async function getClockInTime(employeeID: string): Promise<string> {
     return "";
   }
 
-  if (apiData.errors) {
+  if (apiData.errors || !apiData.data.listWorkLogs) {
     return "";
   }
 
@@ -181,7 +181,7 @@ export async function getWorkLogsFromDate(employeeID: string, date: string): Pro
     return [];
   }
 
-  if (apiData.errors) {
+  if (apiData.errors || !apiData.data.listWorkLogs) {
     return [];
   }
   return apiData.data.listWorkLogs.items;

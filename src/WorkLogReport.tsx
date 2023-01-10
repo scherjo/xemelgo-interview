@@ -62,7 +62,8 @@ function WorkLogReport(props: WorkLogReportProps): JSX.Element {
           Total Job Processing Time: {(totalSecondsWorkOrder / SECONDS_PER_HOUR).toFixed(1)} hours
         </Heading>
         <Heading level={5}>
-          Total Efficiency: {(totalSecondsWorkOrder / totalSecondsClockedIn).toFixed(1)}%
+          Total Efficiency: {totalSecondsClockedIn === 0 ? "N/A" :
+                               `${(totalSecondsWorkOrder / totalSecondsClockedIn).toFixed(1)}%`}
         </Heading>
       </Flex>
       {

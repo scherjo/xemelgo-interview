@@ -1,4 +1,4 @@
-import { Button, Flex, Heading, Table, Text, TextField, View } from "@aws-amplify/ui-react";
+import { Button, Flex, Heading, Text, TextField, View } from "@aws-amplify/ui-react";
 import { FormEvent, useState } from "react";
 import { getEmployeeID, getEmployeeUsername } from "./apiHelpers";
 import { DATE_FORMAT_STR, dateTimeIsValid, matchesDateFormat } from "./utilities";
@@ -29,7 +29,7 @@ function WorkLogSearch(): JSX.Element {
       id = employeeID;
       username = await getEmployeeUsername(id);
       if (username === "") {
-        setSubmitErrorMessage(`Cannot find employee with id ${id}`);
+        setSubmitErrorMessage(`Cannot find employee with ID ${id}`);
         return;
       }
     }
@@ -124,11 +124,16 @@ function WorkLogSearch(): JSX.Element {
       </View>
       {
         submittedID === "" ? null :
-        <WorkLogReport
-          employeeID={submittedID}
-          employeeUsername={submittedUsername}
-          workDate={submittedWorkDate}
-        ></WorkLogReport>
+        <View>
+          <Heading level={4} margin="1rem 0">
+            Displaying results for {submittedUsername} on {workDate}
+          </Heading>
+          <WorkLogReport
+            employeeID={submittedID}
+            employeeUsername={submittedUsername}
+            workDate={submittedWorkDate}
+          ></WorkLogReport>
+        </View>
       }
     </View>
   );

@@ -1,14 +1,15 @@
-import React from 'react';
-import './App.css';
-import { Authenticator } from "@aws-amplify/ui-react";
-import { AmplifyUser } from '@aws-amplify/ui';
+import "./App.css";
+import "@aws-amplify/ui-react/styles.css";
+import { Authenticator, Button, Text } from "@aws-amplify/ui-react";
+import { AmplifyUser } from "@aws-amplify/ui";
+import WorkTimeLogger from "./WorkTimeLogger";
 
 function isManager(user: AmplifyUser | undefined): boolean {
-  const groups = user?.getSignInUserSession()?.getAccessToken().payload['cognito:groups'];
-  return Boolean(groups?.includes('managers'));
+  const groups = user?.getSignInUserSession()?.getAccessToken().payload["cognito:groups"];
+  return Boolean(groups?.includes("managers"));
 }
 
-function App() {
+function App(): JSX.Element {
   return (
     <Authenticator
       className="App"
@@ -16,9 +17,12 @@ function App() {
     >
       {({ signOut, user }) => (
         <main>
-          <h1>Hello {user?.username}</h1>
-          <h1>Manager Permissions: {String(isManager(user))}</h1>
-          <button onClick={signOut}>Sign out</button>
+          <Text>Hello {user?.username}</Text>
+          <Text>Manager Permissions: {String(isManager(user))}</Text>
+          {
+            !!(user?.username) ? <WorkTimeLogger username={user.username}></WorkTimeLogger> : null
+          }
+          <Button variation="primary" onClick={signOut}>Sign Out</Button>
         </main>
       )}
     </Authenticator>

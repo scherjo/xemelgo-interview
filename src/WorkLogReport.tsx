@@ -13,6 +13,8 @@ interface WorkLogReportProps {
 const MILLISECONDS_PER_SECOND: number = 1000; 
 const SECONDS_PER_HOUR: number = 3600;
 
+// Component for displaying the results of a query for an employee's
+// work logs on a particular date.
 function WorkLogReport(props: WorkLogReportProps): JSX.Element {
   const [workLogs, setWorkLogs] = useState([] as WorkLog[]);
   const [totalSecondsClockedIn, setTotalSecondsClockedIn] = useState(0);

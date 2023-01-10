@@ -4,6 +4,7 @@ import { getEmployeeID, getEmployeeUsername } from "./apiHelpers";
 import { DATE_FORMAT_STR, dateTimeIsValid, matchesDateFormat } from "./utilities";
 import WorkLogReport from "./WorkLogReport";
 
+// Component for displaying the form for searching for an employee's work logs.
 function WorkLogSearch(): JSX.Element {
   const [employeeID, setEmployeeID] = useState("");
   const [employeeUsername, setEmployeeUsername] = useState("");

@@ -5,6 +5,7 @@ interface WorkLogTableProps {
   workLog: WorkLog
 }
 
+// Component for displaying a table for a single work log.
 function WorkLogTable(props: WorkLogTableProps): JSX.Element {
   return (
     <View direction="column">

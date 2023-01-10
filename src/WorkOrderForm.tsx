@@ -14,6 +14,7 @@ interface WorkOrderFormProps {
   employeeID: string
 }
 
+// Component representing the form for logging a work order.
 function WorkOrderForm(props: WorkOrderFormProps): JSX.Element {
   const [orderNumErrorMessage, setOrderNumErrorMessage] = useState("");
   const [startTimeErrorMessage, setStartTimeErrorMessage] = useState("");

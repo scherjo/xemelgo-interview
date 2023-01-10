@@ -8,6 +8,8 @@ interface WorkTimeLoggerProps {
   username: string
 }
 
+// Component for handling clocking in and out and containing the form for
+// logging a work order.
 function WorkTimeLogger(props: WorkTimeLoggerProps): JSX.Element {
   const [employeeID, setEmployeeID] = useState("");
   const [clockInTime, setClockInTime] = useState("");

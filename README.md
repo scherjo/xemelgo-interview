@@ -1,3 +1,5 @@
+This project is a web app for logging in and out, tracking employee hours, providing functionality for clocking in and out, submitting information related to work orders, and for people with manager permissions, searching for information on employee hours and worktime efficiency.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
